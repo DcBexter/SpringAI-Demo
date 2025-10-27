@@ -1,0 +1,120 @@
+<mat-card class="chat-card">
+  <mat-card-header>
+    <mat-card-title>
+      <mat-icon>chat</mat-icon>
+      Chat with AI
+    </mat-card-title>
+  </mat-card-header>
+
+  <mat-card-content>
+    <!-- Model and RAG Controls -->
+    <div class="rag-controls">
+      <app-model-selector></app-model-selector>
+      
+      <mat-slide-toggle 
+        [(ngModel)]="ragEnabled"
+        color="primary"
+        [matTooltip]="ragEnabled ? 'RAG mode enabled - answers based on uploaded documents' : 'Regular chat mode'">
+        <mat-icon>{{ ragEnabled ? 'description' : 'chat_bubble' }}</mat-icon>
+        RAG Mode
+      </mat-slide-toggle>
+
+      @if (ragEnabled) {
+        <div class="file-upload-section">
+          <input 
+            #txtFileInput
+            type="file" 
+            id="txtFileInput"
+            accept=".txt,text/plain"
+            (change)="onFileSelected($event)"
+            [disabled]="isUploadingFile"
+            hidden>
+          
+          <button 
+            mat-stroked-button 
+            color="primary"
+            (click)="txtFileInput.click()"
+            [disabled]="isUploadingFile"
+            matTooltip="Upload a text file to index for RAG queries">
+            <mat-icon>attach_file</mat-icon>
+            {{ selectedFile ? selectedFile.name : 'Upload Document' }}
+          </button>
+
+          @if (selectedFile) {
+            <button 
+              mat-raised-button 
+              color="primary" 
+              (click)="uploadTextFile()"
+              [disabled]="isUploadingFile">
+              <mat-icon>cloud_upload</mat-icon>
+              Index
+            </button>
+          }
+
+          @if (hasIndexedDocuments) {
+            <span class="indexed-indicator">
+              <mat-icon>check_circle</mat-icon>
+              Documents indexed
+            </span>
+          }
+        </div>
+      }
+    </div>
+    <div class="message-container" #messageContainer>
+      <mat-list class="message-list">
+        @for (message of chatHistory; track message.timestamp) {
+          <mat-list-item [class]="'message-item message-' + message.role">
+            <div class="message-bubble">
+              @if (message.role === 'ai') {
+                <markdown class="message-content" [data]="message.content"></markdown>
+              } @else {
+                <div class="message-content">{{ message.content }}</div>
+              }
+              <div class="message-timestamp">
+                {{ message.timestamp | date:'short' }}
+              </div>
+            </div>
+          </mat-list-item>
+        }
+        
+        @if (isLoading) {
+          <mat-list-item class="message-item message-ai">
+            <div class="message-bubble loading-bubble">
+              <mat-spinner diameter="24"></mat-spinner>
+              <span class="loading-text">AI is thinking...</span>
+            </div>
+          </mat-list-item>
+        }
+      </mat-list>
+
+      @if (chatHistory.length === 0 && !isLoading) {
+        <div class="empty-state">
+          <mat-icon>chat_bubble_outline</mat-icon>
+          <p>Start a conversation with the AI</p>
+        </div>
+      }
+    </div>
+
+    <div class="input-container">
+      <mat-form-field appearance="outline" class="message-input">
+        <mat-label>Type your message</mat-label>
+        <input 
+          matInput 
+          [formControl]="messageControl"
+          (keypress)="onKeyPress($event)"
+          placeholder="Ask me anything...">
+        <mat-icon matSuffix>message</mat-icon>
+      </mat-form-field>
+
+      <button 
+        mat-raised-button 
+        color="primary" 
+        (click)="sendMessage()"
+        [disabled]="messageControl.invalid || isLoading"
+        class="send-button">
+        <mat-icon>send</mat-icon>
+        Send
+      </button>
+    </div>
+  </mat-card-content>
+</mat-card>

@@ -1,0 +1,71 @@
+<div class="conversation-list">
+  <div class="list-header">
+    <h3>Conversations</h3>
+    <div class="header-actions">
+      <button 
+        mat-icon-button 
+        (click)="loadConversations()"
+        matTooltip="Refresh"
+        [disabled]="isLoading">
+        <mat-icon>refresh</mat-icon>
+      </button>
+      <button 
+        mat-icon-button 
+        (click)="createNewConversation()"
+        matTooltip="New conversation"
+        color="primary">
+        <mat-icon>add</mat-icon>
+      </button>
+    </div>
+  </div>
+
+  <mat-divider></mat-divider>
+
+  @if (isLoading) {
+    <div class="loading-container">
+      <mat-spinner diameter="40"></mat-spinner>
+    </div>
+  }
+
+  @if (!isLoading && conversations.length === 0) {
+    <div class="empty-state">
+      <mat-icon>chat_bubble_outline</mat-icon>
+      <p>No saved conversations yet</p>
+      <p class="hint">Send a message to start a conversation</p>
+      <button mat-raised-button color="primary" (click)="createNewConversation()">
+        Start New Chat
+      </button>
+    </div>
+  }
+
+  @if (!isLoading && conversations.length > 0) {
+    <mat-list class="conversation-items">
+      @for (conversation of conversations; track conversation.conversationId) {
+        <mat-list-item 
+          (click)="selectConversation(conversation.conversationId)"
+          [class.active]="conversation.conversationId === currentConversationId">
+          <div class="conversation-item">
+            <div class="conversation-info">
+              <div class="conversation-title">
+                <mat-icon>chat</mat-icon>
+                <span>{{ conversation.title || 'New Conversation' }}</span>
+              </div>
+              <div class="conversation-meta">
+                <span class="message-count">{{ conversation.messageCount }} messages</span>
+                <span class="last-updated">{{ formatDate(conversation.lastUpdated) }}</span>
+              </div>
+            </div>
+            <button 
+              mat-icon-button 
+              (click)="deleteConversation(conversation.conversationId, $event)"
+              matTooltip="Delete conversation"
+              class="delete-button">
+              <mat-icon>delete</mat-icon>
+            </button>
+          </div>
+        </mat-list-item>
+        <mat-divider></mat-divider>
+      }
+    </mat-list>
+  }
+</div>
