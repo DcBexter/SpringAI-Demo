@@ -1,0 +1,38 @@
+.model-selector {
+  width: 200px;
+  margin: 0;
+}
+
+.model-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.model-type-icon {
+  font-size: 18px;
+  width: 18px;
+  height: 18px;
+}
+
+.model-name {
+  flex: 1;
+}
+
+.status-icon {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+.status-online {
+  color: #4caf50;
+}
+
+.status-offline {
+  color: #f44336;
+}
+
+.status-loading {
+  color: #ff9800;
+}

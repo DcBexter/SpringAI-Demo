@@ -1,0 +1,139 @@
+.debug-panel {
+  margin: 16px 0;
+  
+  .panel-title {
+    margin-left: 8px;
+    font-weight: 500;
+  }
+
+  mat-icon {
+    vertical-align: middle;
+  }
+}
+
+.debug-content {
+  padding: 16px 0;
+
+  .debug-disabled-message {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 16px;
+    background-color: #f5f5f5;
+    border-radius: 4px;
+    color: rgba(0, 0, 0, 0.6);
+
+    mat-icon {
+      color: rgba(0, 0, 0, 0.54);
+    }
+
+    p {
+      margin: 0;
+      font-size: 14px;
+    }
+  }
+
+  .action-buttons {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 16px;
+
+    button {
+      mat-icon {
+        margin-right: 4px;
+      }
+    }
+  }
+
+  .debug-section {
+    padding: 16px 0;
+
+    h3 {
+      margin: 0 0 12px 0;
+      font-size: 16px;
+      font-weight: 500;
+      color: rgba(0, 0, 0, 0.87);
+    }
+
+    .no-data {
+      color: rgba(0, 0, 0, 0.54);
+      font-style: italic;
+      margin: 8px 0;
+    }
+
+    mat-chip-set {
+      margin: 8px 0;
+    }
+
+    mat-list {
+      mat-list-item {
+        height: auto;
+        min-height: 48px;
+        padding: 8px 0;
+
+        .timestamp {
+          font-size: 12px;
+          color: rgba(0, 0, 0, 0.54);
+        }
+
+        .endpoint {
+          font-family: 'Courier New', monospace;
+          font-size: 12px;
+          word-break: break-all;
+        }
+
+        pre {
+          margin: 4px 0;
+          padding: 8px;
+          background-color: #f5f5f5;
+          border-radius: 4px;
+          font-size: 12px;
+          overflow-x: auto;
+          max-width: 100%;
+        }
+
+        mat-chip {
+          &.success {
+            background-color: #4caf50;
+            color: white;
+          }
+
+          &.error {
+            background-color: #f44336;
+            color: white;
+          }
+        }
+      }
+    }
+  }
+
+  mat-divider {
+    margin: 16px 0;
+  }
+}
+
+// Responsive adjustments
+@media (max-width: 768px) {
+  .debug-content {
+    .action-buttons {
+      flex-direction: column;
+
+      button {
+        width: 100%;
+      }
+    }
+
+    .debug-section {
+      h3 {
+        font-size: 14px;
+      }
+
+      mat-list-item {
+        .endpoint,
+        pre {
+          font-size: 11px;
+        }
+      }
+    }
+  }
+}

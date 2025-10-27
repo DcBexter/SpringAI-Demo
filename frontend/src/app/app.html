@@ -1,0 +1,29 @@
+<mat-toolbar color="secondary" class="app-toolbar">
+  <img src="haeger_logo.png" alt="Haeger Logo" class="app-logo">
+  <span>Spring AI RAG Tools Demo</span>
+</mat-toolbar>
+
+<div class="app-container">
+  <div class="sidebar">
+    <app-conversation-list #conversationList [currentConversationId]="chatComponent.conversationId"
+      (conversationSelected)="chatComponent.loadConversation($event)"
+      (newConversation)="chatComponent.startNewConversation()">
+    </app-conversation-list>
+  </div>
+
+  <div class="main-content">
+    <div class="content-grid">
+      <div class="chat-section">
+        <app-chat #chatComponent (messageSent)="conversationList.loadConversations()"
+          (conversationChanged)="debugPanel.refresh()">
+        </app-chat>
+      </div>
+    </div>
+
+    <div class="debug-section">
+      <app-debug-panel #debugPanel></app-debug-panel>
+    </div>
+  </div>
+</div>
+
+<router-outlet />
