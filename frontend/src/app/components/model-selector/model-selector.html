@@ -1,0 +1,10 @@
+<mat-form-field appearance="outline" class="model-selector">
+  <mat-label>AI Model</mat-label>
+  <mat-select [(value)]="selectedModel" (selectionChange)="onModelChange($event)">
+    <mat-option *ngFor="let model of availableModels" [value]="model.name">
+      <div class="model-option">
+        <span class="model-name">{{ model.displayName }}</span>
+      </div>
+    </mat-option>
+  </mat-select>
+</mat-form-field>
