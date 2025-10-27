@@ -1,0 +1,222 @@
+<mat-expansion-panel class="debug-panel">
+  <mat-expansion-panel-header>
+    <mat-panel-title>
+      <mat-icon>bug_report</mat-icon>
+      <span class="panel-title">Debug Panel</span>
+    </mat-panel-title>
+    <mat-panel-description>
+      <mat-slide-toggle
+        [(ngModel)]="debugEnabled"
+        (change)="toggleDebug()"
+        (click)="$event.stopPropagation()"
+        color="primary">
+        {{ debugEnabled ? 'Enabled' : 'Disabled' }}
+      </mat-slide-toggle>
+    </mat-panel-description>
+  </mat-expansion-panel-header>
+
+  <div class="debug-content">
+    <!-- Debug Disabled Message -->
+    <div class="debug-disabled-message" *ngIf="!debugEnabled">
+      <mat-icon>info</mat-icon>
+      <p>Debug mode is disabled. Enable it to see debug information and track requests.</p>
+    </div>
+
+    <div *ngIf="debugEnabled">
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button mat-raised-button color="primary" (click)="refresh()">
+        <mat-icon>refresh</mat-icon>
+        Refresh
+      </button>
+      <button mat-raised-button color="accent" (click)="copyDebugInfo()">
+        <mat-icon>content_copy</mat-icon>
+        Copy to Clipboard
+      </button>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- Conversation ID -->
+    <div class="debug-section">
+      <h3>Conversation ID</h3>
+      <mat-chip-set>
+        <mat-chip>{{ conversationId || 'Not set' }}</mat-chip>
+      </mat-chip-set>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- Chat History -->
+    <div class="debug-section">
+      <h3>Chat History ({{ chatHistory.length }} messages)</h3>
+      <mat-list *ngIf="chatHistory.length > 0; else noHistory">
+        <mat-list-item *ngFor="let message of chatHistory">
+          <mat-icon matListItemIcon>{{ message.role === 'user' ? 'person' : 'smart_toy' }}</mat-icon>
+          <div matListItemTitle>{{ message.role === 'user' ? 'User' : 'AI' }}</div>
+          <div matListItemLine>{{ message.content }}</div>
+          <div matListItemLine class="timestamp">{{ formatTimestamp(message.timestamp) }}</div>
+        </mat-list-item>
+      </mat-list>
+      <ng-template #noHistory>
+        <p class="no-data">No chat history available</p>
+      </ng-template>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- Chat Memory -->
+    <div class="debug-section" *ngIf="chatMemory">
+      <h3>Chat Memory (Backend)</h3>
+      <mat-list>
+        <mat-list-item>
+          <div matListItemTitle>Conversation ID</div>
+          <div matListItemLine>{{ chatMemory.conversationId || 'N/A' }}</div>
+        </mat-list-item>
+        <mat-list-item>
+          <div matListItemTitle>Message Count</div>
+          <div matListItemLine>{{ chatMemory.messageCount || 0 }}</div>
+        </mat-list-item>
+        <mat-list-item *ngIf="chatMemory.lastUpdated">
+          <div matListItemTitle>Last Updated</div>
+          <div matListItemLine>{{ formatTimestamp(chatMemory.lastUpdated) }}</div>
+        </mat-list-item>
+      </mat-list>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- Model Settings -->
+    <div class="debug-section">
+      <h3>Model Settings</h3>
+      <mat-list *ngIf="modelSettings; else noModelSettings">
+        <mat-list-item>
+          <div matListItemTitle>Model Name</div>
+          <div matListItemLine>{{ modelSettings.modelName }}</div>
+        </mat-list-item>
+        <mat-list-item>
+          <div matListItemTitle>Temperature</div>
+          <div matListItemLine>{{ modelSettings.temperature }}</div>
+        </mat-list-item>
+        <mat-list-item *ngIf="modelSettings.maxTokens">
+          <div matListItemTitle>Max Tokens</div>
+          <div matListItemLine>{{ modelSettings.maxTokens }}</div>
+        </mat-list-item>
+      </mat-list>
+      <ng-template #noModelSettings>
+        <p class="no-data">Model settings not available</p>
+      </ng-template>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- API Endpoints -->
+    <div class="debug-section">
+      <h3>API Endpoints</h3>
+      <mat-list *ngIf="apiEndpoints">
+        <mat-list-item>
+          <div matListItemTitle>Chat</div>
+          <div matListItemLine class="endpoint">{{ apiEndpoints.chat }}</div>
+        </mat-list-item>
+        <mat-list-item>
+          <div matListItemTitle>RAG Add Text</div>
+          <div matListItemLine class="endpoint">{{ apiEndpoints.ragAddText }}</div>
+        </mat-list-item>
+        <mat-list-item>
+          <div matListItemTitle>RAG Ask</div>
+          <div matListItemLine class="endpoint">{{ apiEndpoints.ragAsk }}</div>
+        </mat-list-item>
+        <mat-list-item>
+          <div matListItemTitle>Info Model</div>
+          <div matListItemLine class="endpoint">{{ apiEndpoints.infoModel }}</div>
+        </mat-list-item>
+        <mat-list-item>
+          <div matListItemTitle>Info Memory</div>
+          <div matListItemLine class="endpoint">{{ apiEndpoints.infoMemory }}</div>
+        </mat-list-item>
+        <mat-list-item>
+          <div matListItemTitle>Info Vector Store</div>
+          <div matListItemLine class="endpoint">{{ apiEndpoints.infoVectorStore }}</div>
+        </mat-list-item>
+      </mat-list>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- Last Request -->
+    <div class="debug-section">
+      <h3>Last Request</h3>
+      <mat-list *ngIf="lastRequest; else noRequest">
+        <mat-list-item>
+          <div matListItemTitle>Method</div>
+          <div matListItemLine>{{ lastRequest.method }}</div>
+        </mat-list-item>
+        <mat-list-item>
+          <div matListItemTitle>URL</div>
+          <div matListItemLine class="endpoint">{{ lastRequest.url }}</div>
+        </mat-list-item>
+        <mat-list-item>
+          <div matListItemTitle>Timestamp</div>
+          <div matListItemLine>{{ formatTimestamp(lastRequest.timestamp) }}</div>
+        </mat-list-item>
+        <mat-list-item *ngIf="lastRequest.body">
+          <div matListItemTitle>Body</div>
+          <div matListItemLine><pre>{{ lastRequest.body | json }}</pre></div>
+        </mat-list-item>
+      </mat-list>
+      <ng-template #noRequest>
+        <p class="no-data">No request data available</p>
+      </ng-template>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- Last Response -->
+    <div class="debug-section">
+      <h3>Last Response</h3>
+      <mat-list *ngIf="lastResponse; else noResponse">
+        <mat-list-item>
+          <div matListItemTitle>Status Code</div>
+          <div matListItemLine>
+            <mat-chip [class.success]="lastResponse.statusCode >= 200 && lastResponse.statusCode < 300"
+                      [class.error]="lastResponse.statusCode >= 400">
+              {{ lastResponse.statusCode }}
+            </mat-chip>
+          </div>
+        </mat-list-item>
+        <mat-list-item>
+          <div matListItemTitle>Duration</div>
+          <div matListItemLine>{{ formatDuration(lastResponse.duration) }}</div>
+        </mat-list-item>
+        <mat-list-item>
+          <div matListItemTitle>Timestamp</div>
+          <div matListItemLine>{{ formatTimestamp(lastResponse.timestamp) }}</div>
+        </mat-list-item>
+        <mat-list-item *ngIf="lastResponse.body">
+          <div matListItemTitle>Body</div>
+          <div matListItemLine><pre>{{ lastResponse.body | json }}</pre></div>
+        </mat-list-item>
+      </mat-list>
+      <ng-template #noResponse>
+        <p class="no-data">No response data available</p>
+      </ng-template>
+    </div>
+
+    <mat-divider></mat-divider>
+
+    <!-- Vector Store Statistics -->
+    <div class="debug-section">
+      <h3>Vector Store Statistics</h3>
+      <mat-list *ngIf="vectorStoreStats; else noVectorStats">
+        <mat-list-item *ngFor="let stat of vectorStoreStats | keyvalue">
+          <div matListItemTitle>{{ stat.key }}</div>
+          <div matListItemLine>{{ stat.value }}</div>
+        </mat-list-item>
+      </mat-list>
+      <ng-template #noVectorStats>
+        <p class="no-data">Vector store statistics not available</p>
+      </ng-template>
+    </div>
+    </div>
+  </div>
+</mat-expansion-panel>

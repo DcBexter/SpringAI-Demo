@@ -1,0 +1,18 @@
+<mat-form-field appearance="outline" class="model-selector">
+  <mat-label>AI Model</mat-label>
+  <mat-select [(value)]="selectedModel" (selectionChange)="onModelChange($event)">
+    <mat-option *ngFor="let model of availableModels" [value]="model.name">
+      <div class="model-option">
+        <mat-icon class="model-type-icon">
+          {{ model.type === 'cloud' ? 'cloud' : 'computer' }}
+        </mat-icon>
+        <span class="model-name">{{ model.displayName }}</span>
+        <mat-icon 
+          [class]="'status-icon status-' + model.status.toLowerCase()"
+          [matTooltip]="model.status">
+          {{ getStatusIcon(model.status) }}
+        </mat-icon>
+      </div>
+    </mat-option>
+  </mat-select>
+</mat-form-field>

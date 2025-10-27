@@ -1,0 +1,88 @@
+.app-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 1000;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+
+  .app-logo {
+    height: 40px;
+    width: auto;
+    object-fit: contain;
+  }
+
+  span {
+    font-size: 20px;
+    font-weight: 500;
+  }
+}
+
+.app-container {
+  display: flex;
+  min-height: calc(100vh - 64px); // Subtract toolbar height
+  box-sizing: border-box;
+}
+
+.sidebar {
+  width: 280px;
+  flex-shrink: 0;
+  background-color: white;
+  overflow-y: auto;
+  
+  @media (max-width: 1024px) {
+    width: 240px;
+  }
+  
+  @media (max-width: 768px) {
+    display: none; // Hide sidebar on mobile
+  }
+}
+
+.main-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  padding: 16px;
+  overflow-x: hidden;
+}
+
+.content-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin-bottom: 16px;
+  flex: 1;
+}
+
+.chat-section {
+  display: flex;
+  flex-direction: column;
+  min-height: 600px;
+  flex: 1;
+  
+  @media (max-width: 768px) {
+    min-height: 500px;
+  }
+}
+
+.debug-section {
+  width: 100%;
+  margin-top: auto; // Push to bottom
+}
+
+// Responsive breakpoints
+@media (max-width: 768px) {
+  .app-container {
+    padding: 8px;
+  }
+  
+  .content-grid {
+    gap: 8px;
+  }
+  
+  .main-content {
+    margin-bottom: 8px;
+  }
+}

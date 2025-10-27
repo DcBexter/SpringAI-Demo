@@ -1,0 +1,65 @@
+services:
+  ollama:
+    image: ollama/ollama:latest
+    ports:
+      - "11434:11434"
+    volumes:
+      - ollama_data:/root/.ollama
+      - ./ollama-entrypoint.sh:/entrypoint.sh
+    restart: unless-stopped
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost:11434/" ]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    entrypoint: [ "/bin/bash", "/entrypoint.sh" ]
+
+  backend:
+    build: ./backend
+    environment:
+      GEMINI_PROJECT_ID: ${GEMINI_PROJECT_ID}
+      GEMINI_LOCATION: ${GEMINI_LOCATION}
+      GOOGLE_APPLICATION_CREDENTIALS: /app/gcp-credentials.json
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/ai
+      SPRING_DATASOURCE_USERNAME: aiuser
+      SPRING_DATASOURCE_PASSWORD: aisecret
+      OLLAMA_BASE_URL: http://ollama:11434
+    volumes:
+      - ./gcp-credentials.json:/app/gcp-credentials.json:ro
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+      ollama:
+        condition: service_healthy
+    restart: unless-stopped
+
+  frontend:
+    build: ./frontend
+    ports:
+      - "4200:80"
+    depends_on:
+      - backend
+    restart: unless-stopped
+
+  db:
+    image: pgvector/pgvector:pg18-trixie
+    environment:
+      POSTGRES_USER: aiuser
+      POSTGRES_PASSWORD: aisecret
+      POSTGRES_DB: ai
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data
+      - ./backend/init:/docker-entrypoint-initdb.d
+    healthcheck:
+      test: [ "CMD-SHELL", "pg_isready -U aiuser -d ai" ]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  pgdata:
+  ollama_data:
